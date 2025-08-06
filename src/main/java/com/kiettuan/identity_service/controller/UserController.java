@@ -1,6 +1,7 @@
 package com.kiettuan.identity_service.controller;
 
 import com.kiettuan.identity_service.dto.request.UserCreationRequest;
+import com.kiettuan.identity_service.dto.request.UserUpdateRequest;
 import com.kiettuan.identity_service.entity.User;
 import com.kiettuan.identity_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,10 @@ public class UserController {
     @GetMapping("/{userId}")
     User getUser(@PathVariable String userId){
         return userService.getUser(userId);
+    }
+
+    @PutMapping("/{userId}")
+    User updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request){
+        return  userService.updateUser(userId,request);
     }
 }
