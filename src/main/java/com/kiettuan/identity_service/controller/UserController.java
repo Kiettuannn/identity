@@ -18,8 +18,15 @@ public class UserController {
         return userService.createUser(request);
     }
 
+    // Get all users
     @GetMapping
     List<User> getUsers(){
         return userService.getUsers();
+    }
+
+    // Get a user
+    @GetMapping("/{userId}")
+    User getUser(@PathVariable String userId){
+        return userService.getUser(userId);
     }
 }
