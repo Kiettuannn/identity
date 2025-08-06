@@ -4,17 +4,22 @@ import com.kiettuan.identity_service.dto.request.UserCreationRequest;
 import com.kiettuan.identity_service.entity.User;
 import com.kiettuan.identity_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+@RequestMapping("/users")
 @RestController
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/users")
+    @PostMapping
     User createUser(@RequestBody UserCreationRequest request){
         return userService.createUser(request);
+    }
+
+    @GetMapping
+    List<User> getUsers(){
+        return userService.getUsers();
     }
 }
