@@ -11,11 +11,11 @@ import java.time.LocalDate;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private  String id;
-    private  String username;
-    private  String password;
-    private  String firstname;
-    private  String lastname;
+    private String id;
+    private String username;
+    private String password;
+    private String firstname;
+    private String lastname;
     private LocalDate dob;
 
     public String getId() {
