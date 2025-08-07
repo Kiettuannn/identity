@@ -7,6 +7,7 @@ public enum ErrorCode {
     INVALID_PASSWORD(1004, "Password must be at least 8 characters"),
     INVALID_KEY(1005, "Invalid message key"),
     USER_NOT_EXISTED(1006, "User not existed"),
+    UNAUTHENTICATED(1007, "Unauthenticated"),
 
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized")
 
