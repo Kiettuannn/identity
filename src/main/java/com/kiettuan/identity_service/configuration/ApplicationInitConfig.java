@@ -24,7 +24,7 @@ public class ApplicationInitConfig {
     ApplicationRunner applicationRunner(UserRepository userRepository){
         return args -> {
             // Check existed "admin" is  username
-            if(!userRepository.findByUsername("admin").isEmpty()){
+            if(userRepository.findByUsername("admin").isEmpty()){
                 var roles = new HashSet<String>();
                 roles.add(Role.ADMIN.name());
 
