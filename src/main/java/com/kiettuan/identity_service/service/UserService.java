@@ -8,6 +8,7 @@ import com.kiettuan.identity_service.enums.Role;
 import com.kiettuan.identity_service.exception.AppException;
 import com.kiettuan.identity_service.exception.ErrorCode;
 import com.kiettuan.identity_service.mapper.UserMapper;
+import com.kiettuan.identity_service.repository.RoleRepository;
 import com.kiettuan.identity_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +32,11 @@ import java.util.Optional;
 @Slf4j
 public class UserService {
     UserRepository userRepository;
+    RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
     UserMapper userMapper;
 
+    ///  CREATE A USER
     public User createUser(UserCreationRequest request){
         if(userRepository.existsByUsername(request.getUsername()))
             throw new AppException(ErrorCode.USER_EXISTED);
@@ -49,12 +52,14 @@ public class UserService {
     }
 
 
+    ///  GET ALL USERS
     @PreAuthorize("hasRole('ADMIN')")
     public List<User> getUsers(){
         log.info("In method get Users");
         return userRepository.findAll();
     }
 
+    ///  Get A USER BY ID
     @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUser(String id){
         log.info("In method gets a user by Id");
@@ -62,6 +67,7 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
 
+    ///  Get MY INFO
     public UserResponse getMyInfo(){
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
@@ -71,10 +77,18 @@ public class UserService {
         return  userMapper.toUserResponse(user);
     }
 
+    /// UPDATE A USER
     public UserResponse updateUser(String userId, UserUpdateRequest request){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         userMapper.updateUser(user,request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        /// Get roles ID (name of roles)
+        var roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(roles));
+
+
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
