@@ -1,14 +1,23 @@
 package com.kiettuan.identity_service.exception;
 
 import com.kiettuan.identity_service.dto.request.ApiResponse;
+import jakarta.validation.ConstraintViolation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.Map;
+import java.util.Objects;
+
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final String MIN_ATTRIBUTE = "min";
+
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception){
         ApiResponse apiResponse = new ApiResponse();
@@ -51,16 +60,41 @@ public class GlobalExceptionHandler {
 
         ErrorCode errorCode = ErrorCode.INVALID_KEY;
 
+        Map<String, Object> attributes = null;
+
         try{
             errorCode = ErrorCode.valueOf(enumKey);
+
+            /// Get params of annotation
+            var constraintViolation = exception.getBindingResult()
+                    .getAllErrors().getFirst().unwrap(ConstraintViolation.class);
+
+            attributes = constraintViolation.getConstraintDescriptor().getAttributes();
+            /// End Get params of annotation
+
+            // log.info(attributes.toString());
         }catch (IllegalArgumentException e){
 
         }
         ApiResponse apiResponse = new ApiResponse();
 
+        // Set code
         apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(errorCode.getMessage());
+
+        // Set message: Check:
+        // If attribute not null -> map attribute
+        // ELse: get errorCode
+        apiResponse.setMessage(Objects.nonNull(attributes) ?
+                mapAttribute(errorCode.getMessage(),attributes)
+                : errorCode.getMessage());
 
         return  ResponseEntity.badRequest().body(apiResponse);
+    }
+
+    private String mapAttribute(String message, Map<String, Object> attribute){
+        // Get "min" of annotation
+        String minValue = String.valueOf(attribute.get(MIN_ATTRIBUTE));
+
+        return message.replace("{" + MIN_ATTRIBUTE + "}",minValue);
     }
 }
