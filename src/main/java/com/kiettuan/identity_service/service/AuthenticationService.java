@@ -3,6 +3,7 @@ package com.kiettuan.identity_service.service;
 import com.kiettuan.identity_service.dto.request.AuthenticationRequest;
 import com.kiettuan.identity_service.dto.request.IntrospectRequest;
 import com.kiettuan.identity_service.dto.request.LogoutRequest;
+import com.kiettuan.identity_service.dto.request.RefreshTokenRequest;
 import com.kiettuan.identity_service.dto.response.AuthenticationResponse;
 import com.kiettuan.identity_service.dto.response.IntrospectResponse;
 import com.kiettuan.identity_service.entity.InvalidatedToken;
@@ -84,15 +85,49 @@ public class AuthenticationService {
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
         var signToken = verifyToken(request.getToken());
 
-        String jwtId = signToken.getJWTClaimsSet().getJWTID();
+        String jti = signToken.getJWTClaimsSet().getJWTID();
         Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
 
         InvalidatedToken invalidatedToken = InvalidatedToken.builder()
-                .id(jwtId)
+                .id(jti)
                 .expiryTime(expiryTime)
                 .build();
 
         invalidatedTokenRepository.save(invalidatedToken);
+    }
+
+    /// Refresh token
+    public AuthenticationResponse refreshToken(RefreshTokenRequest request)
+            throws ParseException, JOSEException {
+
+        // Step 1: Check validation of the token.
+        var signJWT = verifyToken(request.getToken());
+
+        // Step 2: Invalidate old token
+        var jti = signJWT.getJWTClaimsSet().getJWTID();
+        var expiryTime = signJWT.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jti)
+                .expiryTime(expiryTime)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+
+        // Step 3: Create a new token base on current user
+        var username = signJWT.getJWTClaimsSet().getSubject();
+
+        // Get user
+        var user = userRepository.findByUsername(username).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED)
+        );
+
+        // Generate token
+        var token = generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
     }
 
     ///  VERIFY TOKEN
