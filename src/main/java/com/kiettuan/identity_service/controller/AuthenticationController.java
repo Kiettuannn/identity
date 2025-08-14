@@ -1,9 +1,6 @@
 package com.kiettuan.identity_service.controller;
 
-import com.kiettuan.identity_service.dto.request.ApiResponse;
-import com.kiettuan.identity_service.dto.request.AuthenticationRequest;
-import com.kiettuan.identity_service.dto.request.IntrospectRequest;
-import com.kiettuan.identity_service.dto.request.LogoutRequest;
+import com.kiettuan.identity_service.dto.request.*;
 import com.kiettuan.identity_service.dto.response.AuthenticationResponse;
 import com.kiettuan.identity_service.dto.response.IntrospectResponse;
 import com.kiettuan.identity_service.service.AuthenticationService;
@@ -44,4 +41,18 @@ public class AuthenticationController {
         return ApiResponse.<Void>builder()
                 .build();
     }
+
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshTokenRequest request)
+            throws ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(result)
+                .build();
+    }
+
+
+
+
 }
