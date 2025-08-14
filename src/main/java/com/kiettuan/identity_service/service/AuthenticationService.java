@@ -50,12 +50,16 @@ public class AuthenticationService {
     ///  INTROSPECT
     public IntrospectResponse introspect(IntrospectRequest request) throws ParseException, JOSEException {
         var token = request.getToken();
+        boolean isValid = true;
 
-        // SIGNED JWT
-        verifyToken(token);
-
+        // SIGNED JWT = Verify token
+        try{
+            verifyToken(token);
+        }catch (AppException e){
+            isValid = false;
+        }
         return IntrospectResponse.builder()
-                .valid(true)
+                .valid(isValid)
                 .build();
     }
 
@@ -91,7 +95,7 @@ public class AuthenticationService {
         invalidatedTokenRepository.save(invalidatedToken);
     }
 
-    ///  REFRACTOR SIGNED JWT
+    ///  VERIFY TOKEN
     private SignedJWT verifyToken(String token) throws JOSEException, ParseException {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
@@ -103,6 +107,9 @@ public class AuthenticationService {
         if(!(verified && expirationTime.after(new Date())))
             throw new AppException(ErrorCode.UNAUTHENTICATED);
 
+        // Case: User logout but token is not expiry
+        if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+                throw new AppException(ErrorCode.UNAUTHENTICATED);
         return signedJWT;
     }
 
