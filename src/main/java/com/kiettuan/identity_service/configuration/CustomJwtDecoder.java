@@ -30,9 +30,12 @@ public class CustomJwtDecoder implements JwtDecoder {
     @Override
     public Jwt decode(String token) throws JwtException {
         try{
-            authenticationService.introspect(IntrospectRequest.builder()
+            var response = authenticationService.introspect(IntrospectRequest.builder()
                             .token(token)
                     .build());
+            if(!response.isValid())
+                throw new JwtException("Invalid token");
+
         } catch (JOSEException | ParseException e) {
             throw new JwtException(e.getMessage());
         }
