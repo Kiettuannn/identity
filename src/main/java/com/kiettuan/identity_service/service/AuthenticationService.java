@@ -2,6 +2,7 @@ package com.kiettuan.identity_service.service;
 
 import com.kiettuan.identity_service.dto.request.AuthenticationRequest;
 import com.kiettuan.identity_service.dto.request.IntrospectRequest;
+import com.kiettuan.identity_service.dto.request.LogoutRequest;
 import com.kiettuan.identity_service.dto.response.AuthenticationResponse;
 import com.kiettuan.identity_service.dto.response.IntrospectResponse;
 import com.kiettuan.identity_service.entity.User;
@@ -71,6 +72,10 @@ public class AuthenticationService {
                 .token(token)
                 .authenticated(true)
                 .build();
+    }
+
+    public void logout(LogoutRequest request){
+
     }
 
     String generateToken(User user){
