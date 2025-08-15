@@ -37,7 +37,9 @@ public class UserService {
     UserMapper userMapper;
 
     ///  CREATE A USER
-    public User createUser(UserCreationRequest request){
+    public UserResponse createUser(UserCreationRequest request){
+        log.info("Service: Create User");
+
         if(userRepository.existsByUsername(request.getUsername()))
             throw new AppException(ErrorCode.USER_EXISTED);
 
@@ -48,7 +50,7 @@ public class UserService {
         roles.add(Role.USER.name());
 //        user.setRoles(roles);
 
-        return userRepository.save(user);
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
 
