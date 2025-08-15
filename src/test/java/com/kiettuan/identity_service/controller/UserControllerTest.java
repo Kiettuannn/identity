@@ -79,7 +79,8 @@ public class UserControllerTest {
                     .contentType(MediaType.APPLICATION_JSON_VALUE) // data type
                     .content(content)) // response
                 .andExpect(MockMvcResultMatchers.status().isOk()) // status
-                .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000)); // code
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.id").value("hahahaha"));// code
 
 
     }
