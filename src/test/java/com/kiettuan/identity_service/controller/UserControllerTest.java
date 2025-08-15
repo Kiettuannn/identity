@@ -60,8 +60,8 @@ public class UserControllerTest {
                 .build();
     }
 
-    @Test
     // Test with correct data
+    @Test
     void createUser_validRequest_success() throws Exception {
         // GIVEN
         ObjectMapper objectmapper = new ObjectMapper();
@@ -81,8 +81,26 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk()) // status
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000)) // code
                 .andExpect(MockMvcResultMatchers.jsonPath("result.id").value("hahahaha"));// expect with id
-
-
     }
 
+
+    // Test case: username invalid
+    @Test
+    void createUser_usernameInvalid_fail() throws Exception {
+        // GIVEN
+        request.setUsername("Ke");
+        ObjectMapper objectmapper = new ObjectMapper();
+        objectmapper.registerModule(new JavaTimeModule()); // register for `jackson` package identify LocalDate type
+
+        String content = objectmapper.writeValueAsString(request); // convert object to string
+
+        // WHEN, THEN
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users") // method
+                        .contentType(MediaType.APPLICATION_JSON_VALUE) // data type
+                        .content(content)) // response
+                .andExpect(MockMvcResultMatchers.status().isBadRequest()) // status
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(1003)) // code
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Username must be at least 3 characters"));// expect message
+    }
 }
