@@ -159,7 +159,8 @@
                 </executions>
                 <configuration>
                     <excludes>
-
+                        <exclude>com/kiettuan/identity_service/mapper/**</exclude>
+                        <exclude>com/kiettuan/identity_service/configuration/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

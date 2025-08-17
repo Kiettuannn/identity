@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -93,6 +94,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "Kiettuan")
     void getMyInfo_valid_success(){
         // GIVEN
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
@@ -103,6 +105,20 @@ public class UserServiceTest {
         // THEN
         assertThat(response.getUsername()).isEqualTo("Kiettuan");
         assertThat(response.getId()).isEqualTo("hahahaha");
+    }
+
+    @Test
+    @WithMockUser(username = "Kiettuan")
+    void getMyInfo_userNotFound_fail(){
+        // GIVEN
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.ofNullable(null));
+
+        // WHEN
+        var exception = assertThrows(AppException.class,
+                () -> userService.getMyInfo());
+
+        // THEN
+        assertThat(exception.getErrorCode().getCode()).isEqualTo(1002);
     }
 
 }

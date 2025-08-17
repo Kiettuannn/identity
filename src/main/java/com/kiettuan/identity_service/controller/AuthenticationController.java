@@ -51,8 +51,4 @@ public class AuthenticationController {
                 .result(result)
                 .build();
     }
-
-
-
-
 }
