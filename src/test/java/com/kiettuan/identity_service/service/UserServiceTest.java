@@ -92,4 +92,17 @@ public class UserServiceTest {
         assertThat(exception.getErrorCode().getCode()).isEqualTo(1001);
     }
 
+    @Test
+    void getMyInfo_valid_success(){
+        // GIVEN
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+
+        // WHEN
+        var response = userService.getMyInfo();
+
+        // THEN
+        assertThat(response.getUsername()).isEqualTo("Kiettuan");
+        assertThat(response.getId()).isEqualTo("hahahaha");
+    }
+
 }
