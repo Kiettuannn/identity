@@ -1,23 +1,15 @@
 package com.kiettuan.identity_service.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.kiettuan.identity_service.dto.request.UserCreationRequest;
-import com.kiettuan.identity_service.dto.response.UserResponse;
-import com.kiettuan.identity_service.service.UserService;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -25,7 +17,12 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kiettuan.identity_service.dto.request.UserCreationRequest;
+import com.kiettuan.identity_service.dto.response.UserResponse;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
@@ -52,8 +49,8 @@ public class UserControllerIntegrationTest {
     private LocalDate dob;
 
     @BeforeEach
-    void initData(){
-        dob = LocalDate.of(2005,1,25);
+    void initData() {
+        dob = LocalDate.of(2005, 1, 25);
         request = UserCreationRequest.builder()
                 .username("Kiettuan")
                 .password("123456789")
@@ -61,7 +58,6 @@ public class UserControllerIntegrationTest {
                 .lastname("Tuan")
                 .dob(dob)
                 .build();
-
     }
 
     // Test with correct data
@@ -73,10 +69,8 @@ public class UserControllerIntegrationTest {
 
         String content = objectmapper.writeValueAsString(request); // convert object to string
 
-
         // WHEN, THEN
-        var response = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users") // method
+        var response = mockMvc.perform(MockMvcRequestBuilders.post("/users") // method
                         .contentType(MediaType.APPLICATION_JSON_VALUE) // data type
                         .content(content)) // response
                 .andExpect(MockMvcResultMatchers.status().isOk()) // status
@@ -85,9 +79,6 @@ public class UserControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("result.firstname").value("Kiet"))
                 .andExpect(MockMvcResultMatchers.jsonPath("result.lastname").value("Tuan"));
 
-        log.info("Result: {}",response.andReturn().getResponse().getContentAsString());
-
+        log.info("Result: {}", response.andReturn().getResponse().getContentAsString());
     }
-
-
 }

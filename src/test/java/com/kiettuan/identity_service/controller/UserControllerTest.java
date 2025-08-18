@@ -1,12 +1,7 @@
 package com.kiettuan.identity_service.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.kiettuan.identity_service.dto.request.UserCreationRequest;
-import com.kiettuan.identity_service.dto.response.UserResponse;
-import com.kiettuan.identity_service.service.UserService;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -21,10 +16,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.time.LocalDate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kiettuan.identity_service.dto.request.UserCreationRequest;
+import com.kiettuan.identity_service.dto.response.UserResponse;
+import com.kiettuan.identity_service.service.UserService;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
@@ -43,8 +41,8 @@ public class UserControllerTest {
     private LocalDate dob;
 
     @BeforeEach
-    void initData(){
-        dob = LocalDate.of(2005,1,25);
+    void initData() {
+        dob = LocalDate.of(2005, 1, 25);
         request = UserCreationRequest.builder()
                 .username("Kiettuan")
                 .password("123456789")
@@ -72,19 +70,16 @@ public class UserControllerTest {
         String content = objectmapper.writeValueAsString(request); // convert object to string
 
         // Mock method call service filter
-        Mockito.when(userService.createUser(ArgumentMatchers.any()))
-                .thenReturn(userResponse);
+        Mockito.when(userService.createUser(ArgumentMatchers.any())).thenReturn(userResponse);
 
         // WHEN, THEN
-        mockMvc.perform(MockMvcRequestBuilders
-                    .post("/users") // method
-                    .contentType(MediaType.APPLICATION_JSON_VALUE) // data type
-                    .content(content)) // response
+        mockMvc.perform(MockMvcRequestBuilders.post("/users") // method
+                        .contentType(MediaType.APPLICATION_JSON_VALUE) // data type
+                        .content(content)) // response
                 .andExpect(MockMvcResultMatchers.status().isOk()) // status
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000)) // code
-                .andExpect(MockMvcResultMatchers.jsonPath("result.id").value("hahahaha"));// expect with id
+                .andExpect(MockMvcResultMatchers.jsonPath("result.id").value("hahahaha")); // expect with id
     }
-
 
     // Test case: username invalid
     @Test
@@ -97,13 +92,12 @@ public class UserControllerTest {
         String content = objectmapper.writeValueAsString(request); // convert object to string
 
         // WHEN, THEN
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users") // method
+        mockMvc.perform(MockMvcRequestBuilders.post("/users") // method
                         .contentType(MediaType.APPLICATION_JSON_VALUE) // data type
                         .content(content)) // response
                 .andExpect(MockMvcResultMatchers.status().isBadRequest()) // status
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(1003)) // code
-                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Username must be at least 3 characters"));// expect message
+                .andExpect(MockMvcResultMatchers.jsonPath("message")
+                        .value("Username must be at least 3 characters")); // expect message
     }
-
 }
